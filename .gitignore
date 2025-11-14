@@ -1,0 +1,37 @@
+# Ignore build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Ignore NuGet Packages
+packages/
+
+# Ignore JetBrains Rider directory
+.idea/
+
+# VS Code directories
+.vscode/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Scaffolding generate files
+ScaffoldingReadMe.txt
+
+# Microsoft Azure Build Artifacts
+csx/
+*.build.csdef
+
+# Others
+*.ser
+*.SQLITE
+*.dbmdl
+.vs
