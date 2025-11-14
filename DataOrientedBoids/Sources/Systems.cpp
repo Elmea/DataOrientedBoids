@@ -20,30 +20,24 @@ namespace systems
 		Vector2 avgPos{ 0,0 };
 		Vector2 avgVelocity{ 0,0 };
 
-		std::atomic<Vector2> avoidatomic = avoidVector;
-
 		for (int j = 0; j < fixObstaclesPos.data.size(); j++)
 		{
 			if (j == idx)
 				continue;
 
-			float squaredDist = Vector2DistanceSqr(positionComp->data[idx], fixObstaclesPos.data[j]) - (fixObstaclesRadius.data[j] * fixObstaclesRadius.data[j]);
+			float squaredDist = Vector2Distance(positionComp->data[idx], fixObstaclesPos.data[j]) - (fixObstaclesRadius.data[j]);
 
-			if (squaredDist < BOIDS_VISUALRANGE_SQR)
+
+			if (squaredDist < BOIDS_VISUALRANGE)
 			{
-				if (squaredDist < BOIDS_PROTECTEDRANGE_SQR)
-				{
-					avoidatomic = avoidatomic + (positionComp->data[idx] - fixObstaclesPos.data[j]) * BOIDS_AVOIDFACTOR_OBS;
-				}
-				else
-				{
-					avgPos += fixObstaclesPos.data[j];
-					avgVelocity += fixObstaclesPos.data[j];
-				}
+				if (squaredDist < BOIDS_PROTECTEDRANGE)
+					avoidVector += (positionComp->data[idx] - fixObstaclesPos.data[j]) * BOIDS_AVOIDFACTOR_OBS;
+				else 
+					avoidVector += (positionComp->data[idx] - fixObstaclesPos.data[j]) * BOIDS_AVOIDFACTOR_OBS * 0.15f;
 			}
 		}
 
-		return avoidatomic;
+		return avoidVector;
 	}
 
 	Vector2 MovementSystem::AvoidBoids(int idx, components::PositionComponent* positionComp, 
