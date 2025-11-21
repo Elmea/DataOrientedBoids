@@ -35,3 +35,4 @@ csx/
 *.SQLITE
 *.dbmdl
 .vs
+*.mp4

@@ -7,8 +7,18 @@
 #pragma region App
 void Game::WindowSetup()
 {
+#if TRANSPARENTWINDOW
+    SetConfigFlags(FLAG_WINDOW_TRANSPARENT);
+#endif
+    
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Data oriented boids");
+    SetWindowState(FLAG_WINDOW_UNDECORATED);
+
+#if READ_VID
+    SetTargetFPS(vidFPS);
+#else
     SetTargetFPS(TARGETFPS);
+#endif
 }
 
 void Game::SystemsSetup()
@@ -18,6 +28,10 @@ void Game::SystemsSetup()
 
 void Game::Setup()
 {
+#if READ_VID
+    CacheVideo();
+#endif
+
     SystemsSetup();
 
     if (!windowsSetuped)
@@ -48,6 +62,36 @@ void Game::Run()
     }
 
     Close();
+}
+
+void Game::CacheVideo()
+{
+    cv::VideoCapture cap(VIDEOPATH);
+
+    if (!cap.isOpened()) {
+        std::cout << "Error: Could not open video file." << std::endl;
+        return;
+    }
+    else {
+        std::cout << "Video file opened successfully!" << std::endl;
+    }
+
+    bool ret = true;
+    while(ret)
+    {
+        cv::Mat frame;
+        ret = cap.read(frame);
+
+        frames.push_back(frame.clone());
+
+
+    }
+
+    vidFPS = cap.get(cv::CAP_PROP_FPS);
+    vidHeight = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+    vidWitdh = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+
+    cap.release();
 }
 #pragma endregion
 
@@ -120,10 +164,22 @@ void Game::Render()
 {
     BeginDrawing();
 
-    ClearBackground(BLACK);
+    ClearBackground(BLANK);
 
     obstacleRenderer.RenderObstacle(fixObstacles.fixObstaclePositions, fixObstacles.fixObstacleRadius);
+
+#if !READ_VID
     boidsRenderer.RenderBoids(boids.positionsComponent, boids.velocityComponent);
+#else
+
+    boidsRenderer.RenderBoidsVideo(boids.positionsComponent, boids.velocityComponent,                                    frames[currFrameId], vidWitdh, vidHeight);
+
+    currFrameId++;
+    if (currFrameId >= frames.size())
+        currFrameId = 0;
+
+    DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 40, 10, WHITE);
+#endif
 
     DrawText(TextFormat("FPS: %i", GetFPS()), 10, 10, 20, GREEN);
 

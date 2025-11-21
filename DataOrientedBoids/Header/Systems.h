@@ -2,7 +2,9 @@
 
 #include <thread>
 
+#include "opencv2/opencv.hpp"
 #include "parameters.h"
+#include "opencv2/opencv.hpp"
 #include "components.h"
 
 namespace systems
@@ -36,6 +38,8 @@ namespace systems
 	{
 
 		void RenderBoids(const components::PositionComponent&, const components::VelocityComponent&);
+
+		void RenderBoidsVideo(const components::PositionComponent& positionComp, const components::VelocityComponent& velocityComp, cv::Mat frame, int vidWitdh, int vidHeight);
 	};
 
 	struct ObstacleRenderer

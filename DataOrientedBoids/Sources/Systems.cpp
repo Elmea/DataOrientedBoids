@@ -195,6 +195,12 @@ namespace systems
 		}
 	}
 
+	void BoidsRenderer::RenderBoidsVideo(const PositionComponent& positionComp, const VelocityComponent& velocityComp, cv::Mat frame, int vidWitdh, int vidHeight)
+	{
+		for (int idx = 0; idx < positionComp.data.size(); idx++)
+			rendering::DrawBoid(positionComp.data[idx], velocityComp.data[idx], frame, vidWitdh, vidHeight);
+	}
+
 	void ObstacleRenderer::RenderObstacle(const components::PositionComponent& pos, const components::RadiusComponent& r)
 	{
 		for (int idx = 0; idx < pos.data.size(); idx++)
