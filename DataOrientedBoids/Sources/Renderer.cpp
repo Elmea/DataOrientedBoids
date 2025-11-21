@@ -16,7 +16,7 @@ void rendering::DrawBoid(Vector2 position, Vector2 velocity)
 	float speed = Vector2Length(velocity);
 	Color color = ColorLerp(BOIDS_MINSPEEDCOLOR, BOIDS_MAXSPEEDCOLOR, (speed - BOIDS_MINSPEED) / (BOIDS_MAXSPEED - BOIDS_MINSPEED));
 
-	DrawTriangleLines(v1 + position, v2 + position, v3 + position, color);
+	DrawTriangle(v1 + position, v2 + position, v3 + position, color);
 }
 
 void rendering::DrawBoid(Vector2 position, Vector2 velocity, cv::Mat frame, int vidWitdh, int vidHeight)

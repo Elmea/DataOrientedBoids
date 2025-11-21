@@ -12,6 +12,7 @@ class Game
 private:
 
     bool windowsSetuped = false;
+    bool drawTransparent = true;
     Boids boids;
     FixObstacle fixObstacles;
 
@@ -22,6 +23,7 @@ private:
     std::vector<cv::Mat> frames;
     int currFrameId = 0;
     int vidWitdh, vidHeight, vidFPS;
+    float timeSinceLastVidFrame = 0;
 
 public:
 

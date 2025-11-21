@@ -14,11 +14,7 @@ void Game::WindowSetup()
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Data oriented boids");
     SetWindowState(FLAG_WINDOW_UNDECORATED);
 
-#if READ_VID
-    SetTargetFPS(vidFPS);
-#else
     SetTargetFPS(TARGETFPS);
-#endif
 }
 
 void Game::SystemsSetup()
@@ -82,9 +78,10 @@ void Game::CacheVideo()
         cv::Mat frame;
         ret = cap.read(frame);
 
+        if (!ret)
+            break;
+
         frames.push_back(frame.clone());
-
-
     }
 
     vidFPS = cap.get(cv::CAP_PROP_FPS);
@@ -146,11 +143,14 @@ void Game::InputsHandling()
     if (IsKeyPressed(KeyboardKey::KEY_P))
     {
         fixObstacles.Clear();
-        AddRandomObstacle(OBSTACLE_STARTCOUNT);
+        AddRandomObstacle(OBSTACLE_RANDSPAWN);
     }
 
     if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
         fixObstacles.AddFixObstacle(GetMousePosition(), OBSTACLE_PLAYERRADIUS);
+
+    if (IsKeyPressed(KeyboardKey::KEY_B))
+        drawTransparent = !drawTransparent;
 }
 
 void Game::Update()
@@ -164,7 +164,10 @@ void Game::Render()
 {
     BeginDrawing();
 
-    ClearBackground(BLANK);
+    if (drawTransparent)
+        ClearBackground(BLANK);
+    else 
+        ClearBackground(BLACK);
 
     obstacleRenderer.RenderObstacle(fixObstacles.fixObstaclePositions, fixObstacles.fixObstacleRadius);
 
@@ -173,15 +176,20 @@ void Game::Render()
 #else
 
     boidsRenderer.RenderBoidsVideo(boids.positionsComponent, boids.velocityComponent,                                    frames[currFrameId], vidWitdh, vidHeight);
+    
+    timeSinceLastVidFrame += GetFrameTime();
+    if (timeSinceLastVidFrame > 1.0f / vidFPS)
+    {
+        timeSinceLastVidFrame = 0;
+        currFrameId++;
+        if (currFrameId >= frames.size())
+            currFrameId = 0;
+    }
 
-    currFrameId++;
-    if (currFrameId >= frames.size())
-        currFrameId = 0;
-
-    DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 40, 10, WHITE);
+    // DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 40, 10, WHITE);
 #endif
 
-    DrawText(TextFormat("FPS: %i", GetFPS()), 10, 10, 20, GREEN);
+    // DrawText(TextFormat("FPS: %i", GetFPS()), 10, 10, 20, GREEN);
 
     EndDrawing();
 }
