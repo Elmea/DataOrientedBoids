@@ -81,69 +81,118 @@ namespace systems
 		return avoidVector;
 	}
 
-	void MovementSystem::UpdateMovements(PositionComponent* positionComp, VelocityComponent* velocityComp,
-									const components::PositionComponent& fixObstaclesPos, const components::RadiusComponent& fixObstaclesRadius)
+	void MovementSystem::UpdateMovements()
 	{
-		for (int idx = 0; idx < positionComp->data.size(); idx++)
+		threadCompleted = 0;
+		for(int i = 0; i < coreCount; i++)
 		{
-			Vector2* myPos = &positionComp->data[idx];
-			Vector2* myVel = &velocityComp->data[idx];
-
-			Vector2 boidAvoidVector = AvoidBoids(idx, positionComp, velocityComp, { 0,0 });
-			Vector2 ObstacleAvoidVector = AvoidObstacle(idx, positionComp, velocityComp, fixObstaclesPos, fixObstaclesRadius, { 0,0 });
-
-			*myVel += (boidAvoidVector * BOIDS_AVOIDFACTOR);
-			*myVel += (ObstacleAvoidVector * BOIDS_AVOIDFACTOR_OBS);
-
-			#if BOIDS_AVOID_LEFTRIGHT
-			if (myPos->x + BOIDS_NEAR_EDGE > SCREEN_WIDTH)
-				myVel->x -= BOIDS_OUTBOUNDS_TURNFAC;
-			else if (myPos->x - BOIDS_NEAR_EDGE < 0)
-				myVel->x += BOIDS_OUTBOUNDS_TURNFAC;
-			#endif
-
-			#if BOIDS_AVOID_TOPBOTTOM
-			if (myPos->y + BOIDS_NEAR_EDGE > SCREEN_HEIGHT)
-				myVel->y -= BOIDS_OUTBOUNDS_TURNFAC;
-			else if (myPos->y - BOIDS_NEAR_EDGE < 0)
-				myVel->y += BOIDS_OUTBOUNDS_TURNFAC;
-			#endif
-
-			float speed = Vector2Length(*myVel);
-			if (speed > BOIDS_MAXSPEED)
-			{
-				velocityComp->data[idx].x = (velocityComp->data[idx].x / speed) * BOIDS_MINSPEED;
-				velocityComp->data[idx].y = (velocityComp->data[idx].y / speed) * BOIDS_MINSPEED;
-			}
-			else if (speed < BOIDS_MINSPEED)
-			{
-				myVel->x = (myVel->x / speed) * BOIDS_MINSPEED;
-				myVel->y = (myVel->y / speed) * BOIDS_MINSPEED;
-			}
-
-			Vector2 dir = Vector2Normalize(*myVel);
-			float rotation = (float)(atan2(dir.y, dir.x));
-
-			*myPos += *myVel * GetFrameTime();
-
-			#if BOIDS_ALWAYSINBOUNDS
-			if (myPos->x > SCREEN_WIDTH)
-				myPos->x = 0;
-			else if (myPos->x < 0)
-				myPos->x = SCREEN_WIDTH;
-
-			if (myPos->y > SCREEN_HEIGHT)
-				myPos->y = 0;
-			else if (myPos->y < 0)
-				myPos->y = SCREEN_HEIGHT;
-			#endif
+			updateThreadSignals[i] = true;
 		}
+
+		while (threadCompleted != coreCount)
+			std::this_thread::sleep_for(std::chrono::seconds(0));
+	}
+
+	void MovementSystem::InitMovementThreads(PositionComponent* positionComp, VelocityComponent* velocityComp, components::PositionComponent* fixObstaclesPos, components::RadiusComponent* fixObstaclesRadius)
+	{
+		updateThreadSignals = new std::atomic<bool>[coreCount];
+
+		for (int i = 0; i < coreCount; i++)
+		{
+			std::unique_ptr<std::thread> newThread = std::make_unique<std::thread>(&MovementSystem::UpdateBoidThread, this, positionComp, velocityComp, fixObstaclesPos, fixObstaclesRadius, i);
+
+			threads.emplace_back(std::move(newThread));
+
+			updateThreadSignals[i] = false;
+		}
+	}
+
+	void MovementSystem::UpdateBoidThread(PositionComponent* positionComp, VelocityComponent* velocityComp, components::PositionComponent* fixObstaclesPos, components::RadiusComponent* fixObstaclesRadius, int id)
+	{
+		int from = id * boidPerCore;
+		int to = id * boidPerCore + boidPerCore;
+
+		while (!freeThreads)
+		{
+			if (updateThreadSignals[id])
+			{
+				for (int idx = from; idx < to; idx++)
+				{
+					Vector2* myPos = &positionComp->data[idx];
+					Vector2* myVel = &velocityComp->data[idx];
+
+					Vector2 boidAvoidVector = AvoidBoids(idx, positionComp, velocityComp, { 0,0 });
+					Vector2 ObstacleAvoidVector = AvoidObstacle(idx, positionComp, velocityComp, *fixObstaclesPos, *fixObstaclesRadius, { 0,0 });
+
+					*myVel += (boidAvoidVector * BOIDS_AVOIDFACTOR);
+					*myVel += (ObstacleAvoidVector * BOIDS_AVOIDFACTOR_OBS);
+
+#if BOIDS_AVOID_LEFTRIGHT
+					if (myPos->x + BOIDS_NEAR_EDGE > SCREEN_WIDTH)
+						myVel->x -= BOIDS_OUTBOUNDS_TURNFAC;
+					else if (myPos->x - BOIDS_NEAR_EDGE < 0)
+						myVel->x += BOIDS_OUTBOUNDS_TURNFAC;
+#endif
+
+#if BOIDS_AVOID_TOPBOTTOM
+					if (myPos->y + BOIDS_NEAR_EDGE > SCREEN_HEIGHT)
+						myVel->y -= BOIDS_OUTBOUNDS_TURNFAC;
+					else if (myPos->y - BOIDS_NEAR_EDGE < 0)
+						myVel->y += BOIDS_OUTBOUNDS_TURNFAC;
+#endif
+
+					float speed = Vector2Length(*myVel);
+					if (speed > BOIDS_MAXSPEED)
+					{
+						velocityComp->data[idx].x = (velocityComp->data[idx].x / speed) * BOIDS_MINSPEED;
+						velocityComp->data[idx].y = (velocityComp->data[idx].y / speed) * BOIDS_MINSPEED;
+					}
+					else if (speed < BOIDS_MINSPEED)
+					{
+						myVel->x = (myVel->x / speed) * BOIDS_MINSPEED;
+						myVel->y = (myVel->y / speed) * BOIDS_MINSPEED;
+					}
+
+					Vector2 dir = Vector2Normalize(*myVel);
+					float rotation = (float)(atan2(dir.y, dir.x));
+
+					*myPos += *myVel * GetFrameTime();
+
+#if BOIDS_ALWAYSINBOUNDS
+					if (myPos->x > SCREEN_WIDTH)
+						myPos->x = 0;
+					else if (myPos->x < 0)
+						myPos->x = SCREEN_WIDTH;
+
+					if (myPos->y > SCREEN_HEIGHT)
+						myPos->y = 0;
+					else if (myPos->y < 0)
+						myPos->y = SCREEN_HEIGHT;
+#endif
+				}
+				
+				updateThreadSignals[id] = false;
+				threadCompleted++;
+			}
+		}
+	}
+
+	void MovementSystem::Destroy()
+	{
+		freeThreads = true;
+
+		for (std::unique_ptr<std::thread>& t : threads)
+			t.get()->join();
+		
+		delete updateThreadSignals;
 	}
 
 	void BoidsRenderer::RenderBoids(const PositionComponent& positionComp, const VelocityComponent& velocityComp)
 	{
 		for (int idx = 0; idx < positionComp.data.size(); idx++)
+		{
 			rendering::DrawBoid(positionComp.data[idx], velocityComp.data[idx]);
+		}
 	}
 
 	void ObstacleRenderer::RenderObstacle(const components::PositionComponent& pos, const components::RadiusComponent& r)

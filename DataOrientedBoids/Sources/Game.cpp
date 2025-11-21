@@ -28,10 +28,14 @@ void Game::Setup()
 
     AddRandomBoids(BOIDS_SPAWN);
     AddRandomObstacle(OBSTACLE_STARTCOUNT);
+
+    movementSystem.InitMovementThreads(&boids.positionsComponent, &boids.velocityComponent,
+        &fixObstacles.fixObstaclePositions, &fixObstacles.fixObstacleRadius);
 }
 
 void Game::Close()
 {
+    movementSystem.Destroy();
     CloseWindow();
 }
 
@@ -109,8 +113,7 @@ void Game::Update()
 {
     InputsHandling();
 
-    movementSystem.UpdateMovements(&boids.positionsComponent, &boids.velocityComponent,
-                        fixObstacles.fixObstaclePositions, fixObstacles.fixObstacleRadius);
+    movementSystem.UpdateMovements();
 }
 
 void Game::Render()
