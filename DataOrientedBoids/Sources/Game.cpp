@@ -186,10 +186,11 @@ void Game::Render()
             currFrameId = 0;
     }
 
-    // DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 40, 10, WHITE);
+    // DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 50, 10, WHITE);
 #endif
 
     DrawText(TextFormat("FPS: %i", GetFPS()), 10, 10, 20, GREEN);
+    DrawText(TextFormat("Boids count: %i", BOIDS_SPAWN), 10, 30, 10, WHITE);
 
     EndDrawing();
 }
