@@ -189,7 +189,7 @@ void Game::Render()
     // DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 40, 10, WHITE);
 #endif
 
-    // DrawText(TextFormat("FPS: %i", GetFPS()), 10, 10, 20, GREEN);
+    DrawText(TextFormat("FPS: %i", GetFPS()), 10, 10, 20, GREEN);
 
     EndDrawing();
 }

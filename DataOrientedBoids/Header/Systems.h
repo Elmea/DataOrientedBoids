@@ -12,8 +12,8 @@ namespace systems
 	struct MovementSystem
 	{
 		std::vector<std::unique_ptr<std::thread>> threads;
-		const int coreCount = std::thread::hardware_concurrency() / 4;
-		const int boidPerCore = BOIDS_SPAWN / coreCount;
+		const int coreCount = std::thread::hardware_concurrency() - 2;
+		const int boidPerCore = (BOIDS_SPAWN + coreCount - 1) / coreCount;
 		std::atomic<bool>* updateThreadSignals;
 		std::atomic<int> threadCompleted;
 		std::atomic<bool> freeThreads;

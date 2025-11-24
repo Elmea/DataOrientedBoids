@@ -124,8 +124,8 @@ namespace systems
 					Vector2 boidAvoidVector = AvoidBoids(idx, positionComp, velocityComp, { 0,0 });
 					Vector2 ObstacleAvoidVector = AvoidObstacle(idx, positionComp, velocityComp, *fixObstaclesPos, *fixObstaclesRadius, { 0,0 });
 
-					*myVel += (boidAvoidVector * BOIDS_AVOIDFACTOR);
-					*myVel += (ObstacleAvoidVector * BOIDS_AVOIDFACTOR_OBS);
+					*myVel += (boidAvoidVector * BOIDS_AVOIDFACTOR) * GetFrameTime();
+					*myVel += (ObstacleAvoidVector * BOIDS_AVOIDFACTOR_OBS) * GetFrameTime();
 
 #if BOIDS_AVOID_LEFTRIGHT
 					if (myPos->x + BOIDS_NEAR_EDGE > SCREEN_WIDTH)
