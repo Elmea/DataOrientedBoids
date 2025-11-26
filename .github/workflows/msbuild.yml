@@ -56,9 +56,9 @@ jobs:
         path: x64\Release\
 
     - uses: actions/upload-release-asset@v1
-    env:
-      GITHUB_TOKEN: ${{ secrets.token }}
-    with:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      asset_path: x64\Release\
-      asset_name: BoidsBuild
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: x64\Release\
+        asset_name: BoidsBuild
