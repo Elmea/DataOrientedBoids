@@ -4,7 +4,7 @@
 # documentation.
 
 name: MSBuild
-
+ 
 on:
   push:
     branches: [ "master" ]
