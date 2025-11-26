@@ -54,12 +54,12 @@ jobs:
     - name: Copy OpenCV DLL into build folder
       shell: powershell
       run: |
-        Copy-Item C:\opencv\build\x64\vc16\bin\opencv_world4120.pdb x64\Release\BuildResult\
+        Copy-Item C:\opencv\build\x64\vc16\bin\opencv_world4120.pdb x64\Release\
 
     - name: Zip build folder
       shell: powershell
       run: |
-        Compress-Archive -Path x64\Release\BuildResult\* -DestinationPath x64\Release\BuildResult.zip -Force
+        Compress-Archive -Path x64\Release\* -DestinationPath x64\Release\BuildResult.zip -Force
 
     - uses: actions/upload-artifact@v4
       with:
