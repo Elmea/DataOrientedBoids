@@ -56,9 +56,16 @@ jobs:
         path: x64\Release\
 
   upload:
+    runs-on: self-hosted
     need: build
 
     steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v4.3.0
+      with:
+        name: BuildResult
+        path: x64\Release\
+
     - uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.token }}
