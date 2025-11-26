@@ -37,8 +37,12 @@ jobs:
         Set-ExecutionPolicy Bypass -Scope Process -Force
         Write-Host "ExecutionPolicy is now:" (Get-ExecutionPolicy)
 
-    - name: Restore
-      run: dotnet restore ${{env.SOLUTION_FILE_PATH}}
+    - name: Install NuGet
+      run: |
+        Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile nuget.exe
+
+    - name: NuGet restore
+      run: ./nuget.exe restore ${{env.SOLUTION_FILE_PATH}}
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
