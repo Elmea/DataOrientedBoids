@@ -52,12 +52,12 @@ jobs:
 
 
     - name: Copy OpenCV DLL into build folder
-      shell: pwsh
+      shell: powershell
       run: |
         Copy-Item C:\opencv\build\x64\vc16\bin\opencv_world4120.pdb x64\Release\BuildResult\
 
     - name: Zip build folder
-      shell: pwsh
+      shell: powershell
       run: |
         Compress-Archive -Path x64\Release\BuildResult\* -DestinationPath x64\Release\BuildResult.zip -Force
 
