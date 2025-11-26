@@ -50,6 +50,8 @@ void Game::Close()
 
 void Game::Run()
 {
+    Setup();
+
     while (!WindowShouldClose())
     {
         Update();
@@ -91,16 +93,17 @@ void Game::CacheVideo()
 }
 #pragma endregion
 
-void Game::Restart()
-{
-    ClearGame();
-    Setup();
-}
-
+#pragma region Utilities
 void Game::ClearGame()
 {
     boids.Clear();
     fixObstacles.Clear();
+}
+
+void Game::Restart()
+{
+    ClearGame();
+    Setup();
 }
 
 void Game::AddMouseToObstacle()
@@ -109,14 +112,6 @@ void Game::AddMouseToObstacle()
 
     fixObstacles.fixObstaclePositions.data.push_back({ 0, 0 });
     fixObstacles.fixObstacleRadius.data.push_back(MOUSE_OBSTACLE_RADIUS);
-}
-
-void Game::UpdateMouseObstacle()
-{
-    if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_RIGHT))
-        fixObstacles.fixObstaclePositions.data[mouseObsID] = GetMousePosition();
-    else
-        fixObstacles.fixObstaclePositions.data[mouseObsID] = { -100000, -100000 };
 }
 
 void Game::AddRandomBoids(int count)
@@ -146,6 +141,7 @@ void Game::AddRandomObstacle(int count)
         fixObstacles.AddFixObstacle({ randX, randY }, randRadius);
     }
 }
+#pragma endregion
 
 void Game::InputsHandling()
 {
@@ -168,6 +164,14 @@ void Game::InputsHandling()
     if (IsKeyPressed(KeyboardKey::KEY_B))
         drawTransparent = !drawTransparent;
 
+}
+
+void Game::UpdateMouseObstacle()
+{
+    if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_RIGHT))
+        fixObstacles.fixObstaclePositions.data[mouseObsID] = GetMousePosition();
+    else
+        fixObstacles.fixObstaclePositions.data[mouseObsID] = { -100000, -100000 };
 }
 
 void Game::Update()
@@ -202,8 +206,6 @@ void Game::Render()
         if (currFrameId >= frames.size())
             currFrameId = 0;
     }
-
-    // DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 60, 10, WHITE);
 #endif
 
     DrawText(TextFormat("FPS: %i", GetFPS()), 10, 20, 20, GREEN);

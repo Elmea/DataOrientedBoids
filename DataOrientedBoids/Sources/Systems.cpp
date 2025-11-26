@@ -14,6 +14,7 @@ using namespace components;
 
 namespace systems
 {
+#pragma region MovementSytem
 	Vector2 MovementSystem::AvoidObstacle(int idx, components::PositionComponent* positionComp, components::VelocityComponent* velocityComp,
 		const components::PositionComponent& fixObstaclesPos, const components::RadiusComponent& fixObstaclesRadius, Vector2 avoidVector)
 	{
@@ -190,7 +191,9 @@ namespace systems
 		
 		delete updateThreadSignals;
 	}
+#pragma endregion
 
+#pragma region Renderer
 	void BoidsRenderer::RenderBoids(const PositionComponent& positionComp, const VelocityComponent& velocityComp)
 	{
 		for (int idx = 0; idx < positionComp.data.size(); idx++)
@@ -212,4 +215,5 @@ namespace systems
 		for (int idx = 1; idx < pos.data.size(); idx++)
 			rendering::DrawObstacle(pos.data[idx], r.data[idx]);
 	}
+#pragma endregion
 }

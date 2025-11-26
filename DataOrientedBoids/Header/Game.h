@@ -29,28 +29,30 @@ private:
 public:
 
 private:
+#pragma region App
     void WindowSetup();
     void SystemsSetup();
-    void ClearGame();
-
-    void Restart();
-
+    void CacheVideo();
+    void Setup();
     void Close();
+#pragma endregion
+    
+#pragma region Utilities
+    void ClearGame();
+    void Restart();
 
     void AddMouseToObstacle();
     void AddRandomBoids(int);
     void AddRandomObstacle(int);
+#pragma endregion
 
     void InputsHandling();
 
     void UpdateMouseObstacle();
     void Update();
-
     void Render();
-    void CacheVideo();
 
 public:
-    void Setup();
 
     void Run();
 };

@@ -2,10 +2,7 @@
 
 int main(void)
 {
-    Game game;
-
-    game.Setup();
-
+    Game game { };
     game.Run();
 
     return 0;

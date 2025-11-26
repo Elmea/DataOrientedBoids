@@ -4,7 +4,6 @@
 
 #include "opencv2/opencv.hpp"
 #include "parameters.h"
-#include "opencv2/opencv.hpp"
 #include "components.h"
 
 namespace systems

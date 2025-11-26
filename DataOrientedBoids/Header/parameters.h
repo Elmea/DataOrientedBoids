@@ -4,7 +4,7 @@
 
 #define TRANSPARENTWINDOW		true
 
-#define FULLSCREEN true
+#define FULLSCREEN				true
 
 #define SCREEN_WIDTH			1920
 #define SCREEN_HEIGHT			1080
