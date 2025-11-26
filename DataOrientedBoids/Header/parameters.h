@@ -10,7 +10,7 @@
 #define SCREEN_HEIGHT			1080
 
 #ifdef NDEBUG
-#define BOIDS_SPAWN				6500
+#define BOIDS_SPAWN				6250
 #else
 #define BOIDS_SPAWN				1000
 #endif 
