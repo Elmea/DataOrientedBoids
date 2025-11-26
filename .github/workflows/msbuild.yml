@@ -37,9 +37,13 @@ jobs:
         Set-ExecutionPolicy Bypass -Scope Process -Force
         Write-Host "ExecutionPolicy is now:" (Get-ExecutionPolicy)
 
-    - name: Restore NuGet packages
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore
+      run: dotnet restore ${{env.SOLUTION_FILE_PATH}}
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
