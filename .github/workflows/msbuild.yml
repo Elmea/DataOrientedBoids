@@ -26,15 +26,6 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: Debug OpenCV path
-      run: |
-        echo "Listing C:\\opencv"
-        dir C:\opencv
-        echo "Listing include"
-        dir C:\opencv\build\include
-        echo "Listing opencv2"
-        dir C:\opencv\build\include\opencv2
-
     - uses: actions/checkout@v4
 
     - name: Add MSBuild to PATH
