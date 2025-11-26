@@ -19,7 +19,8 @@ void Game::WindowSetup()
 
 void Game::SystemsSetup()
 {
-
+    movementSystem.InitMovementThreads(&boids.positionsComponent, &boids.velocityComponent,
+        &fixObstacles.fixObstaclePositions, &fixObstacles.fixObstacleRadius);
 }
 
 void Game::Setup()
@@ -27,6 +28,10 @@ void Game::Setup()
 #if READ_VID
     CacheVideo();
 #endif
+    AddMouseToObstacle();
+
+    AddRandomBoids(BOIDS_SPAWN);
+    AddRandomObstacle(OBSTACLE_STARTCOUNT);
 
     SystemsSetup();
 
@@ -35,12 +40,6 @@ void Game::Setup()
         WindowSetup();
         windowsSetuped = true;
     }
-
-    AddRandomBoids(BOIDS_SPAWN);
-    AddRandomObstacle(OBSTACLE_STARTCOUNT);
-
-    movementSystem.InitMovementThreads(&boids.positionsComponent, &boids.velocityComponent,
-        &fixObstacles.fixObstaclePositions, &fixObstacles.fixObstacleRadius);
 }
 
 void Game::Close()
@@ -104,6 +103,22 @@ void Game::ClearGame()
     fixObstacles.Clear();
 }
 
+void Game::AddMouseToObstacle()
+{
+    mouseObsID = fixObstacles.fixObstaclePositions.data.size();
+
+    fixObstacles.fixObstaclePositions.data.push_back({ 0, 0 });
+    fixObstacles.fixObstacleRadius.data.push_back(MOUSE_OBSTACLE_RADIUS);
+}
+
+void Game::UpdateMouseObstacle()
+{
+    if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_RIGHT))
+        fixObstacles.fixObstaclePositions.data[mouseObsID] = GetMousePosition();
+    else
+        fixObstacles.fixObstaclePositions.data[mouseObsID] = { -100000, -100000 };
+}
+
 void Game::AddRandomBoids(int count)
 {
     for (int i = 0; i < count; i++)
@@ -143,6 +158,7 @@ void Game::InputsHandling()
     if (IsKeyPressed(KeyboardKey::KEY_P))
     {
         fixObstacles.Clear();
+        AddMouseToObstacle();
         AddRandomObstacle(OBSTACLE_RANDSPAWN);
     }
 
@@ -151,12 +167,13 @@ void Game::InputsHandling()
 
     if (IsKeyPressed(KeyboardKey::KEY_B))
         drawTransparent = !drawTransparent;
+
 }
 
 void Game::Update()
 {
     InputsHandling();
-
+    UpdateMouseObstacle();
     movementSystem.UpdateMovements();
 }
 
@@ -186,11 +203,11 @@ void Game::Render()
             currFrameId = 0;
     }
 
-    // DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 50, 10, WHITE);
+    // DrawText(TextFormat("Vid frame: %i", currFrameId), 10, 60, 10, WHITE);
 #endif
 
-    DrawText(TextFormat("FPS: %i", GetFPS()), 10, 10, 20, GREEN);
-    DrawText(TextFormat("Boids count: %i", BOIDS_SPAWN), 10, 30, 10, WHITE);
+    DrawText(TextFormat("FPS: %i", GetFPS()), 10, 20, 20, GREEN);
+    DrawText(TextFormat("Boids count: %i", BOIDS_SPAWN), 10, 40, 10, WHITE);
 
     EndDrawing();
 }

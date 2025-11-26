@@ -11,4 +11,6 @@ namespace rendering
 	void DrawBoid(Vector2 position, Vector2 velocity, cv::Mat frame, int vidWitdh, int vidHeight);
 
 	void DrawObstacle(Vector2 position, float radius);
+
+	void DrawMouseObstacle(Vector2 position, float radius);
 }

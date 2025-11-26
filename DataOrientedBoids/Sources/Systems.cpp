@@ -111,6 +111,7 @@ namespace systems
 	{
 		int from = id * boidPerCore;
 		int to = id * boidPerCore + boidPerCore;
+		int compSize = positionComp->data.size();
 
 		while (!freeThreads)
 		{
@@ -118,6 +119,9 @@ namespace systems
 			{
 				for (int idx = from; idx < to; idx++)
 				{
+					if (idx >= compSize)
+						break;
+
 					Vector2* myPos = &positionComp->data[idx];
 					Vector2* myVel = &velocityComp->data[idx];
 
@@ -203,7 +207,9 @@ namespace systems
 
 	void ObstacleRenderer::RenderObstacle(const components::PositionComponent& pos, const components::RadiusComponent& r)
 	{
-		for (int idx = 0; idx < pos.data.size(); idx++)
+		rendering::DrawMouseObstacle(pos.data[0], r.data[0]);
+
+		for (int idx = 1; idx < pos.data.size(); idx++)
 			rendering::DrawObstacle(pos.data[idx], r.data[idx]);
 	}
 }

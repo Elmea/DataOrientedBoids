@@ -24,6 +24,7 @@ private:
     int currFrameId = 0;
     int vidWitdh, vidHeight, vidFPS;
     float timeSinceLastVidFrame = 0;
+    int mouseObsID;
 
 public:
 
@@ -36,11 +37,13 @@ private:
 
     void Close();
 
+    void AddMouseToObstacle();
     void AddRandomBoids(int);
     void AddRandomObstacle(int);
 
     void InputsHandling();
 
+    void UpdateMouseObstacle();
     void Update();
 
     void Render();

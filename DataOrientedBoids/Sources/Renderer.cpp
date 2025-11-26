@@ -48,3 +48,8 @@ void rendering::DrawObstacle(Vector2 position, float radius)
 {
 	DrawCircleV(position, radius, DARKGREEN);
 }
+
+void rendering::DrawMouseObstacle(Vector2 position, float radius)
+{
+	DrawCircleLines(position.x, position.y, radius, RED);
+}
